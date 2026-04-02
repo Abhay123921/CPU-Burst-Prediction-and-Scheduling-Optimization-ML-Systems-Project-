@@ -1,0 +1,48 @@
+Last login: Fri Apr  3 01:10:29 on ttys000
+(base) thakurraj@Thakurs-MacBook-Air ~ % cd Documents 
+(base) thakurraj@Thakurs-MacBook-Air Documents % cd Artificial\ Intelligence 
+(base) thakurraj@Thakurs-MacBook-Air Artificial Intelligence % cd Projects 
+(base) thakurraj@Thakurs-MacBook-Air Projects % cd OS 
+(base) thakurraj@Thakurs-MacBook-Air OS % nano .gitignore
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  UW PICO 5.09                    File: .gitignore                    Modified  
+
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.pkl
+*.h5
+*.keras
+*.zip
+data.csv
+processed/
+raw/
+
+
+
+
+
+
+
+
+
+^G Get Help  ^O WriteOut  ^R Read File ^Y Prev Pg   ^K Cut Text  ^C Cur Pos   
+^X Exit      ^J Justify   ^W Where is  ^V Next Pg   ^U UnCut Text^T To Spell  

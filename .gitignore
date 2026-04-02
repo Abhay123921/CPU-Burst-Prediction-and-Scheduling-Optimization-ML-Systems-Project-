@@ -1,0 +1,27 @@
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Models
+*.pkl
+*.h5
+*.keras
+
+# Data
+*.csv
+processed/
+raw/
+
+# Archives
+*.zip.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.pkl
+*.h5
+*.keras
+*.zip
+data.csv
+processed/
+raw/
