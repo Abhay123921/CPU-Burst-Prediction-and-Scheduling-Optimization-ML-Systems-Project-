@@ -1,23 +1,23 @@
 # CPU Burst Prediction & Scheduling Optimization (ML System)
 
-## 🚀 Overview
+## Overview
 This project builds a machine learning-based system to predict CPU burst times and optimize process scheduling decisions. It combines workload simulation, real-world trace data, and multiple ML models to improve scheduling efficiency over traditional heuristics.
 
 ---
 
-## 🧠 Problem Statement
+## Problem Statement
 Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on static assumptions and fail to adapt to dynamic workloads.
 
-👉 This project aims to:
+This project aims to:
 - Predict CPU burst times using ML
 - Improve scheduling decisions using predictions
 - Compare performance with traditional algorithms
 
 ---
 
-## ⚙️ Key Features
+## Key Features
 
-### 🔹 Workload Simulation
+### Workload Simulation
 - Designed a realistic simulator for:
   - CPU-bound processes  
   - IO-bound processes  
@@ -27,7 +27,7 @@ Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on static assumptio
 
 ---
 
-### 🔹 Real-World Data Processing
+### Real-World Data Processing
 - Processed **Google Cluster Trace dataset (~390K samples)**
 - Handled:
   - Irregular formats  
@@ -36,7 +36,7 @@ Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on static assumptio
 
 ---
 
-### 🔹 Machine Learning Models
+### Machine Learning Models
 Implemented and compared:
 - Linear Regression  
 - Random Forest  
@@ -44,15 +44,15 @@ Implemented and compared:
 
 ---
 
-### 🔹 Key Insight
+### Key Insight
 - Observed strong temporal smoothness in CPU usage  
 - Tree-based models outperformed LSTM in short-term prediction  
 
-👉 Important real-world insight for system design
+Important real-world insight for system design
 
 ---
 
-### 🔹 Scheduling Optimization
+### Scheduling Optimization
 - Integrated ML predictions into scheduling logic  
 - Compared against heuristic methods (e.g., SJF)  
 - Achieved:
@@ -61,7 +61,7 @@ Implemented and compared:
 
 ---
 
-### 🔹 End-to-End ML Pipeline
+### End-to-End ML Pipeline
 - Data generation  
 - Preprocessing  
 - Model training & evaluation  
@@ -71,7 +71,7 @@ Implemented and compared:
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 - Python  
 - Scikit-learn  
 - TensorFlow / Keras  
@@ -81,7 +81,7 @@ Implemented and compared:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 scripts/ → preprocessing & training
 api.py → prediction API
 app.py → Streamlit interface
@@ -91,7 +91,7 @@ train_model.py → model training
 
 ---
 
-## ▶️ How to Run
+## How to Run
 
 ```bash
 pip install -r requirements.txt
