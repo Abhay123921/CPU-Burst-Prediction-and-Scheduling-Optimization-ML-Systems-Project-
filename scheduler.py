@@ -4,9 +4,7 @@ import pickle
 import time
 from tensorflow.keras.models import load_model
 
-# ============================
 # LOAD DATA
-# ============================
 
 df = pd.read_csv("data.csv")
 
@@ -21,24 +19,21 @@ val_size = int(0.15 * len(df))
 X_test = X.iloc[train_size + val_size:]
 y_test = y.iloc[train_size + val_size:]
 
-# ============================
+
 # LOAD MODELS
-# ============================
 
 lr_model = pickle.load(open("lr_model.pkl", "rb"))
 rf_model = pickle.load(open("rf_model.pkl", "rb"))
 lstm_model = load_model("lstm_model.keras", compile=False)
 
-# ============================
+
 # HELPER: LSTM INPUT
-# ============================
 
 def prepare_lstm_input(x):
     return x.values.reshape(1, x.shape[0], 1)
 
-# ============================
+
 # SCHEDULER FUNCTION
-# ============================
 
 def run_scheduler(num_processes=50, model_type="rf"):
 
@@ -57,9 +52,8 @@ def run_scheduler(num_processes=50, model_type="rf"):
         history = X_test.iloc[i]
         actual = y_test.iloc[i]
 
-        # ============================
+        
         # ML PREDICTION
-        # ============================
 
         start = time.time()
 
@@ -82,15 +76,13 @@ def run_scheduler(num_processes=50, model_type="rf"):
 
         pred = max(1, pred)  # safety
 
-        # ============================
+        
         # BASELINE (LAST BURST)
-        # ============================
 
         baseline = history.iloc[-1]
 
-        # ============================
+    
         # WAITING TIME (CUMULATIVE)
-        # ============================
 
         waiting_time += pred
         turnaround_time += waiting_time + actual
@@ -98,9 +90,8 @@ def run_scheduler(num_processes=50, model_type="rf"):
         baseline_waiting += baseline
         baseline_turnaround += baseline_waiting + actual
 
-        # ============================
+        
         # PRINT PER PROCESS
-        # ============================
 
         print(f"\nProcess {i+1}")
         print("Actual:", actual)
@@ -110,9 +101,8 @@ def run_scheduler(num_processes=50, model_type="rf"):
         print("Baseline Error:", abs(baseline - actual))
         print("Latency:", round(latency, 4), "sec")
 
-    # ============================
+    
     # FINAL RESULTS
-    # ============================
 
     print("\n==============================")
     print("FINAL RESULTS")
@@ -133,9 +123,8 @@ def run_scheduler(num_processes=50, model_type="rf"):
           round(improvement, 2), "%")
 
 
-# ============================
+
 # RUN ALL MODELS
-# ============================
 
 if __name__ == "__main__":
 
