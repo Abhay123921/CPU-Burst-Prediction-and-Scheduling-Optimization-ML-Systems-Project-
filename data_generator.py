@@ -3,16 +3,12 @@ import random
 import pandas as pd
 import math
 
-# ============================
-# REPRODUCIBILITY
-# ============================
 
 random.seed(42)
 np.random.seed(42)
 
-# ============================
+
 # TARGET FUNCTION
-# ============================
 
 def compute_target(seq):
     weights = [0.25, 0.2, 0.15, 0.15, 0.1, 0.1, 0.05]
@@ -31,9 +27,8 @@ def compute_target(seq):
     return int(max(5, min(60, target)))
 
 
-# ============================
+
 # MAIN DATA GENERATION
-# ============================
 
 def generate_dataset(num_processes=50000, window_size=100):
 
@@ -45,35 +40,26 @@ def generate_dataset(num_processes=50000, window_size=100):
     sequences = [[] for _ in range(num_processes)]
 
     for t in range(window_size):
-
-        # ============================
+        
         # 🔥 SYSTEM LOAD
-        # ============================
-
         cpu_count = sum(1 for s in states if s == "cpu")
         io_count = sum(1 for s in states if s == "io")
 
         cpu_load = cpu_count / num_processes
         io_load = io_count / num_processes
 
-        # ============================
         # UPDATE EACH PROCESS
-        # ============================
 
         for i in range(num_processes):
 
             state = states[i]
             duration = durations[i]
 
-            # ============================
             # DURATION-BASED SWITCHING
-            # ============================
 
             phase_change_prob = min(0.05 + 0.05 * duration, 0.8)
 
-            # ============================
             # LOAD-AWARE TRANSITIONS
-            # ============================
 
             if random.random() < phase_change_prob:
 
@@ -101,9 +87,7 @@ def generate_dataset(num_processes=50000, window_size=100):
             else:
                 duration += 1
 
-            # ============================
             # BASE VALUE GENERATION
-            # ============================
 
             if state == "cpu":
                 val = np.random.normal(30, 5)
@@ -114,22 +98,17 @@ def generate_dataset(num_processes=50000, window_size=100):
             else:
                 val = np.random.normal(20, 10)
 
-            # ============================
             # NONLINEAR SYSTEM SLOWDOWN
-            # ============================
 
             val = val * (1 / (1 + 2 * cpu_load + 1.5 * io_load))
 
-            # ============================
+            
             # WAITING EFFECT (soft queue)
-            # ============================
 
             if state == "cpu" and cpu_load > 0.8 and random.random() < 0.3:
                 val = np.random.normal(5, 2)
 
-            # ============================
             # TEMPORAL CORRELATION
-            # ============================
 
             if len(sequences[i]) >= 3:
                 weights = [0.5, 0.3, 0.2]
@@ -137,9 +116,7 @@ def generate_dataset(num_processes=50000, window_size=100):
                 avg = sum(w * x for w, x in zip(weights, window[::-1]))
                 val = 0.6 * avg + 0.4 * val
 
-            # ============================
             # CLAMP
-            # ============================
 
             val = int(max(5, min(60, val)))
 
@@ -152,10 +129,8 @@ def generate_dataset(num_processes=50000, window_size=100):
         if (t + 1) % 20 == 0:
             print(f"Time step {t+1}/{window_size} completed")
 
-    # ============================
+    
     # BUILD DATASET
-    # ============================
-
     data = []
 
     for i in range(num_processes):
@@ -175,9 +150,7 @@ def generate_dataset(num_processes=50000, window_size=100):
     print("Shape:", df.shape)
 
 
-# ============================
-# RUN
-# ============================
+
 
 if __name__ == "__main__":
     generate_dataset()
