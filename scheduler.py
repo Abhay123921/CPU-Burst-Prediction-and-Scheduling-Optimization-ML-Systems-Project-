@@ -4,6 +4,8 @@ import pickle
 import time
 from tensorflow.keras.models import load_model
 
+
+
 # LOAD DATA
 
 df = pd.read_csv("data.csv")
@@ -25,6 +27,16 @@ y_test = y.iloc[train_size + val_size:]
 lr_model = pickle.load(open("lr_model.pkl", "rb"))
 rf_model = pickle.load(open("rf_model.pkl", "rb"))
 lstm_model = load_model("lstm_model.keras", compile=False)
+
+
+def exponential_avg(history, alpha=0.5):
+    tau = history.iloc[0]  # initial estimate
+    
+    for t in history.iloc[1:]:
+        tau = alpha * t + (1 - alpha) * tau
+    
+    return tau
+
 
 
 # HELPER: LSTM INPUT
@@ -68,20 +80,18 @@ def run_scheduler(num_processes=50, model_type="rf"):
                 prepare_lstm_input(history), verbose=0
             )[0][0]
 
-        else:
-            raise ValueError("Invalid model type")
 
         latency = time.time() - start
         total_latency += latency
 
         pred = max(1, pred)  # safety
 
-        
-        # BASELINE (LAST BURST)
 
-        baseline = history.iloc[-1]
+        # BASELINE
 
-    
+        baseline = exponential_avg(history, alpha=0.6)
+
+
         # WAITING TIME (CUMULATIVE)
 
         waiting_time += pred
@@ -90,7 +100,7 @@ def run_scheduler(num_processes=50, model_type="rf"):
         baseline_waiting += baseline
         baseline_turnaround += baseline_waiting + actual
 
-        
+
         # PRINT PER PROCESS
 
         print(f"\nProcess {i+1}")
