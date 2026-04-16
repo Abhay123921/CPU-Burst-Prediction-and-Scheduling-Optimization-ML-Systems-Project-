@@ -1,99 +1,230 @@
-# CPU Burst Prediction & Scheduling Optimization (ML System)
+# CPU Burst Prediction & Scheduling Optimization (ML Systems Project)
 
 ## Overview
-This project builds a machine learning-based system to predict CPU burst times and optimize process scheduling decisions. It combines workload simulation, real-world trace data, and multiple ML models to improve scheduling efficiency over traditional heuristics.
+
+This project develops an intelligent system for **CPU burst prediction and scheduling optimization** using machine learning. It combines **synthetic workload simulation** and **real-world Google cluster traces** to evaluate when ML models outperform classical OS heuristics.
 
 ---
 
 ## Problem Statement
-Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on static assumptions and fail to adapt to dynamic workloads.
+
+Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on simple heuristics such as last-burst estimation or exponential averaging. These approaches struggle under:
+
+* Non-stationary workloads
+* Nonlinear burst patterns
+* Regime shifts (changing system load)
 
 This project aims to:
-- Predict CPU burst times using ML
-- Improve scheduling decisions using predictions
-- Compare performance with traditional algorithms
+
+* Predict CPU burst times using ML models
+* Compare against **OS-standard heuristics (Exponential Averaging)**
+* Evaluate **system-level impact** (waiting time, turnaround time)
 
 ---
 
-## Key Features
+## System Design
 
-### Workload Simulation
-- Designed a realistic simulator for:
-  - CPU-bound processes  
-  - IO-bound processes  
-  - Interactive workloads  
-- Generated large-scale dataset:
-  - **50K processes × 100 timesteps**
+```text
+Workload → Feature Pipeline → ML Models → Scheduler → System Metrics
+```
 
 ---
 
-### Real-World Data Processing
-- Processed **Google Cluster Trace dataset (~390K samples)**
-- Handled:
-  - Irregular formats  
-  - Nested CPU usage distributions  
-- Converted raw data into structured time-series format
+## Workload Simulation (Advanced)
+
+Designed a realistic simulator modeling:
+
+* CPU-bound, IO-bound, interactive processes
+* Load-aware state transitions
+* Temporal dependencies
+
+### Enhanced Complexity (NEW)
+
+To make the problem non-trivial and ML-relevant:
+
+* Long-term dependencies (breaks simple heuristics)
+* Nonlinear interactions
+* Regime switching (high-load vs low-load phases)
+* Random spikes and noise
+* Hidden periodic patterns
+
+📊 Dataset:
+
+* **50K processes × 120 timesteps (~6M datapoints)**
 
 ---
 
-### Machine Learning Models
+## Real-World Data Pipeline
+
+Processed **Google Cluster Trace dataset (~390K samples)**:
+
+* Parsed irregular string-encoded CPU distributions
+* Converted into structured time-series sequences
+* Built supervised datasets using sliding window
+
+### Key Transformation:
+
+```text
+[CPU sequence] → (past window → future prediction)
+```
+
+---
+
+## Machine Learning Models
+
 Implemented and compared:
-- Linear Regression  
-- Random Forest  
-- LSTM  
 
----
+* **Linear Regression** → baseline linear model
+* **Random Forest** → nonlinear pattern learning
+* **LSTM** → sequential deep learning model
 
 ### Key Insight
-- Observed strong temporal smoothness in CPU usage  
-- Tree-based models outperformed LSTM in short-term prediction  
 
-Important real-world insight for system design
-
----
-
-### Scheduling Optimization
-- Integrated ML predictions into scheduling logic  
-- Compared against heuristic methods (e.g., SJF)  
-- Achieved:
-  - Reduced waiting time  
-  - Improved turnaround time  
+* CPU bursts exhibit strong short-term locality
+* Tree-based models outperform LSTM for short-horizon prediction
+* LSTM becomes useful only under complex/non-stationary patterns
 
 ---
 
-### End-to-End ML Pipeline
-- Data generation  
-- Preprocessing  
-- Model training & evaluation  
-- Deployment:
-  - FastAPI (backend)
-  - Streamlit (UI)
+## Baseline Heuristics (OS-Inspired)
+
+Compared ML models against:
+
+### 1. Last Burst (Naive)
+
+```text
+next ≈ last value
+```
+
+### 2. Exponential Averaging (OS Standard)
+
+```text
+τₙ₊₁ = α·tₙ + (1-α)·τₙ
+```
+
+✔ Smooths noise
+✔ Adapts to recent trends
+
+---
+
+## Critical Insight (IMPORTANT)
+
+* On simple workloads → **Exponential Averaging outperforms ML**
+* On complex workloads → **ML outperforms heuristics**
+
+This demonstrates:
+
+> “ML is not always necessary—its benefit depends on workload complexity.”
+
+---
+
+## Scheduling Evaluation
+
+Simulated scheduling using predicted burst times:
+
+Measured:
+
+* Waiting Time
+* Turnaround Time
+* Prediction Latency
+
+Compared:
+
+* Heuristic baseline (EMA)
+* ML-based predictions
+
+---
+
+## End-to-End ML Pipeline
+
+* Data generation (synthetic simulator)
+* Real data preprocessing
+* Feature engineering
+* Model training & validation
+* System-level evaluation (scheduler)
+* Deployment-ready APIs
+
+---
+
+## Key Learnings
+
+* Short-term smoothness → simple heuristics sufficient
+* Complex/non-stationary workloads → ML necessary
+* Prediction accuracy ≠ system performance (must evaluate scheduler impact)
+* Trade-off between **latency vs accuracy** is critical in systems
 
 ---
 
 ## Tech Stack
-- Python  
-- Scikit-learn  
-- TensorFlow / Keras  
-- Pandas, NumPy  
-- FastAPI  
-- Streamlit  
+
+* Python
+* Scikit-learn
+* TensorFlow / Keras
+* Pandas, NumPy
+* FastAPI
+* Streamlit
 
 ---
 
 ## Project Structure
-scripts/ → preprocessing & training
-api.py → prediction API
-app.py → Streamlit interface
-scheduler.py → scheduling logic
-train_model.py → model training
 
+```text
+OS/
+├── data_generator.py        # synthetic workload simulation
+├── train_model.py          # synthetic model training
+├── scheduler.py            # scheduling evaluation
+├── scripts/
+│   ├── pre_process.py      # real data cleaning
+│   ├── sequence_builder.py # sequence creation
+│   ├── train_real_model.py # real-data training
+├── processed/              # processed datasets
+├── models/                 # saved models
+├── api.py                  # FastAPI backend
+├── app.py                  # Streamlit UI
+```
 
 ---
 
 ## How to Run
 
+### Synthetic Pipeline
+
 ```bash
-pip install -r requirements.txt
+python data_generator.py
 python train_model.py
-python app.py
+python scheduler.py
+```
+
+### Real Data Pipeline
+
+```bash
+cd scripts
+python pre_process.py
+python sequence_builder.py
+python train_real_model.py
+```
+
+---
+
+## Future Improvements
+
+* True SJF scheduling using ML-based ordering
+* Hybrid scheduler (EMA + ML switching)
+* Online learning for adaptive workloads
+* Distributed scheduling simulation
+
+---
+
+## 🏁 Conclusion
+
+This project goes beyond standard ML tasks by integrating:
+
+* Machine learning
+* Operating systems concepts
+* System-level evaluation
+
+It highlights a key systems insight:
+
+> **“The effectiveness of ML depends on the structure and complexity of the underlying workload.”**
+
+---
