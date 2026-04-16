@@ -1,28 +1,40 @@
-# CPU Burst Prediction & Scheduling Optimization (ML Systems Project)
+# CPU Burst Prediction & ML-Driven Scheduling Optimization
 
 ## Overview
 
-This project develops an intelligent system for **CPU burst prediction and scheduling optimization** using machine learning. It combines **synthetic workload simulation** and **real-world Google cluster traces** to evaluate when ML models outperform classical OS heuristics.
+This project builds an **end-to-end ML-driven CPU scheduling system** that predicts CPU burst times and evaluates their impact on scheduling performance.
+
+It combines:
+
+* **Synthetic workload simulation** (controlled experimentation)
+* **Real-world Google cluster traces (~390K samples)** (practical validation)
+
+The system demonstrates **when machine learning improves over classical OS heuristics—and when it does not**.
 
 ---
 
 ## Problem Statement
 
-Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on simple heuristics such as last-burst estimation or exponential averaging. These approaches struggle under:
+Traditional CPU scheduling algorithms (e.g., FCFS, SJF) rely on simple heuristics such as:
+
+* Last-burst estimation
+* Exponential averaging (EMA)
+
+These approaches break down under:
 
 * Non-stationary workloads
 * Nonlinear burst patterns
-* Regime shifts (changing system load)
+* Dynamic system load (regime shifts)
 
-This project aims to:
+### Objectives:
 
 * Predict CPU burst times using ML models
-* Compare against **OS-standard heuristics (Exponential Averaging)**
-* Evaluate **system-level impact** (waiting time, turnaround time)
+* Compare against **OS-standard heuristics (EMA)**
+* Evaluate **system-level performance** (not just prediction accuracy)
 
 ---
 
-## System Design
+## System Architecture
 
 ```text
 Workload → Feature Pipeline → ML Models → Scheduler → System Metrics
@@ -30,27 +42,28 @@ Workload → Feature Pipeline → ML Models → Scheduler → System Metrics
 
 ---
 
-## Workload Simulation (Advanced)
+## ⚙️ Workload Simulation (Synthetic)
 
-Designed a realistic simulator modeling:
+A realistic simulator was designed to model:
 
-* CPU-bound, IO-bound, interactive processes
+* CPU-bound, IO-bound, and interactive processes
 * Load-aware state transitions
 * Temporal dependencies
 
-### Enhanced Complexity (NEW)
+### Enhanced Complexity
 
-To make the problem non-trivial and ML-relevant:
+To create a non-trivial ML problem:
 
-* Long-term dependencies (breaks simple heuristics)
-* Nonlinear interactions
-* Regime switching (high-load vs low-load phases)
+* Long-term dependencies (breaks EMA)
+* Nonlinear feature interactions
+* Regime switching (high-load vs low-load)
 * Random spikes and noise
 * Hidden periodic patterns
 
-📊 Dataset:
+📊 **Dataset Scale**:
 
-* **50K processes × 120 timesteps (~6M datapoints)**
+* ~50,000 processes × 120 timesteps
+* ≈ **6 million datapoints**
 
 ---
 
@@ -58,14 +71,14 @@ To make the problem non-trivial and ML-relevant:
 
 Processed **Google Cluster Trace dataset (~390K samples)**:
 
-* Parsed irregular string-encoded CPU distributions
+* Parsed irregular string-encoded CPU usage distributions
 * Converted into structured time-series sequences
-* Built supervised datasets using sliding window
+* Built supervised datasets via sliding window
 
-### Key Transformation:
+### Transformation:
 
 ```text
-[CPU sequence] → (past window → future prediction)
+[CPU sequence] → (past window → future burst)
 ```
 
 ---
@@ -74,21 +87,19 @@ Processed **Google Cluster Trace dataset (~390K samples)**:
 
 Implemented and compared:
 
-* **Linear Regression** → baseline linear model
-* **Random Forest** → nonlinear pattern learning
-* **LSTM** → sequential deep learning model
+* **Linear Regression** → baseline
+* **Random Forest** → nonlinear modeling
+* **LSTM** → sequence modeling
 
-### Key Insight
+### Key Findings
 
-* CPU bursts exhibit strong short-term locality
-* Tree-based models outperform LSTM for short-horizon prediction
-* LSTM becomes useful only under complex/non-stationary patterns
+* CPU bursts show strong **short-term locality**
+* **Random Forest outperforms LSTM** for short-horizon prediction
+* LSTM is only beneficial under **complex/non-stationary patterns**
 
 ---
 
 ## Baseline Heuristics (OS-Inspired)
-
-Compared ML models against:
 
 ### 1. Last Burst (Naive)
 
@@ -96,7 +107,7 @@ Compared ML models against:
 next ≈ last value
 ```
 
-### 2. Exponential Averaging (OS Standard)
+### 2. Exponential Averaging (EMA)
 
 ```text
 τₙ₊₁ = α·tₙ + (1-α)·τₙ
@@ -107,51 +118,69 @@ next ≈ last value
 
 ---
 
-## Critical Insight (IMPORTANT)
+## Critical Insight
 
-* On simple workloads → **Exponential Averaging outperforms ML**
-* On complex workloads → **ML outperforms heuristics**
+* **Simple workloads → EMA outperforms ML**
+* **Complex workloads → ML outperforms heuristics**
 
-This demonstrates:
-
-> “ML is not always necessary—its benefit depends on workload complexity.”
+> ML is beneficial **only when workload complexity justifies it**
 
 ---
 
-## Scheduling Evaluation
+## 🖥️ Scheduling Evaluation
 
-Simulated scheduling using predicted burst times:
+Implemented **ML-driven SJF scheduling**:
 
-Measured:
+* Predictions used to **order processes**
+* Execution simulated using **actual burst times**
+
+### 📏 Metrics Evaluated
 
 * Waiting Time
 * Turnaround Time
 * Prediction Latency
 
-Compared:
+### Result
 
-* Heuristic baseline (EMA)
-* ML-based predictions
+* **~18–20% reduction in waiting time** over EMA baseline (Random Forest)
+* Demonstrates **real system-level gains from ML**
 
 ---
 
 ## End-to-End ML Pipeline
 
-* Data generation (synthetic simulator)
-* Real data preprocessing
+* Synthetic data generation
+* Real-world data preprocessing
 * Feature engineering
 * Model training & validation
-* System-level evaluation (scheduler)
+* Scheduling simulation
 * Deployment-ready APIs
+
+---
+
+## Deployment
+
+Deployed as an interactive ML system:
+
+* **FastAPI** → backend inference API
+* **Streamlit** → interactive dashboard
+
+### Features:
+
+* Real-time CPU burst prediction
+* Model comparison (LR / RF / LSTM)
+* Scheduling simulation (ML vs EMA)
+* Latency monitoring
 
 ---
 
 ## Key Learnings
 
-* Short-term smoothness → simple heuristics sufficient
-* Complex/non-stationary workloads → ML necessary
-* Prediction accuracy ≠ system performance (must evaluate scheduler impact)
-* Trade-off between **latency vs accuracy** is critical in systems
+* Prediction accuracy ≠ system performance
+* Short-term smoothness → heuristics sufficient
+* Non-stationarity → ML becomes useful
+* Trade-off between **latency vs accuracy** is critical
+* ML should be used **only when it adds value**
 
 ---
 
@@ -172,7 +201,7 @@ Compared:
 OS/
 ├── data_generator.py        # synthetic workload simulation
 ├── train_model.py          # synthetic model training
-├── scheduler.py            # scheduling evaluation
+├── scheduler.py            # ML-based SJF scheduling
 ├── scripts/
 │   ├── pre_process.py      # real data cleaning
 │   ├── sequence_builder.py # sequence creation
@@ -206,25 +235,17 @@ python train_real_model.py
 
 ---
 
-## Future Improvements
+## Future Work
 
-* True SJF scheduling using ML-based ordering
 * Hybrid scheduler (EMA + ML switching)
+* Preemptive scheduling (SRJF)
 * Online learning for adaptive workloads
 * Distributed scheduling simulation
 
 ---
 
-## 🏁 Conclusion
+## Conclusion
 
-This project goes beyond standard ML tasks by integrating:
+This project bridges **Machine Learning + Operating Systems + Systems Design**.
 
-* Machine learning
-* Operating systems concepts
-* System-level evaluation
-
-It highlights a key systems insight:
-
-> **“The effectiveness of ML depends on the structure and complexity of the underlying workload.”**
-
----
+> **“The effectiveness of ML depends on workload structure—simple heuristics often suffice, but ML becomes powerful under complexity and non-stationarity.”**
