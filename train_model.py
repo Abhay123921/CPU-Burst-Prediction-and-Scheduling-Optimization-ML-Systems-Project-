@@ -22,17 +22,13 @@ X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, r
 
 print("Train:", len(X_train), "Val:", len(X_val), "Test:", len(X_test))
 
-
-# LR
-
+# LR 
 lr_model = LinearRegression()
 lr_model.fit(X_train, y_train)
 lr_val_error = mean_absolute_error(y_val, lr_model.predict(X_val))
 print("Linear regression model trained")
 
-
-# RF
-
+# RF (CV)
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
 print("\n🔁 RF Cross Validation:")
@@ -46,15 +42,14 @@ rf_model = RandomForestRegressor(n_estimators=100)
 rf_model.fit(X_train, y_train)
 rf_val_error = mean_absolute_error(y_val, rf_model.predict(X_val))
 
-
-# LSTM 
-
-X_train_lstm = X_train.values.reshape(-1, 100, 1)
-X_val_lstm = X_val.values.reshape(-1, 100, 1)
-X_test_lstm = X_test.values.reshape(-1, 100, 1)
+# LSTM
+WINDOW = X_train.shape[1]
+X_train_lstm = X_train.values.reshape(-1, WINDOW, 1)
+X_val_lstm = X_val.values.reshape(-1, WINDOW, 1)
+X_test_lstm = X_test.values.reshape(-1, WINDOW, 1)
 
 lstm_model = Sequential([
-    LSTM(32, input_shape=(100,1)),
+    LSTM(32, input_shape=(WINDOW,1)),
     Dense(1)
 ])
 
@@ -66,9 +61,7 @@ lstm_model.fit(X_train_lstm, y_train, epochs=5, batch_size=32,
 
 lstm_val_error = mean_absolute_error(y_val, lstm_model.predict(X_val_lstm).flatten())
 
-
 # TEST 
-
 lr_preds = lr_model.predict(X_test)
 rf_preds = rf_model.predict(X_test)
 lstm_preds = lstm_model.predict(X_test_lstm).flatten()
