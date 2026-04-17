@@ -42,7 +42,7 @@ Workload → Feature Pipeline → ML Models → Scheduler → System Metrics
 
 ---
 
-## ⚙️ Workload Simulation (Synthetic)
+## Workload Simulation (Synthetic)
 
 A realistic simulator was designed to model:
 
@@ -60,7 +60,7 @@ To create a non-trivial ML problem:
 * Random spikes and noise
 * Hidden periodic patterns
 
-📊 **Dataset Scale**:
+**Dataset Scale**:
 
 * ~50,000 processes × 120 timesteps
 * ≈ **6 million datapoints**
@@ -127,14 +127,14 @@ next ≈ last value
 
 ---
 
-## 🖥️ Scheduling Evaluation
+## Scheduling Evaluation
 
 Implemented **ML-driven SJF scheduling**:
 
 * Predictions used to **order processes**
 * Execution simulated using **actual burst times**
 
-### 📏 Metrics Evaluated
+### Metrics Evaluated
 
 * Waiting Time
 * Turnaround Time
